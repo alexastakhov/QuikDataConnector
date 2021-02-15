@@ -10,6 +10,8 @@ namespace QuikDataConnectorSample
         public MainWindow()
         {
             InitializeComponent();
+
+            this.DataContext = this;
         }
     }
 }

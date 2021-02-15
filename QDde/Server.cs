@@ -6,7 +6,6 @@ namespace QDde
     {
         public Server(string serviceName) : base(serviceName)
         {
-
         }
 
         public override string Service => base.Service;

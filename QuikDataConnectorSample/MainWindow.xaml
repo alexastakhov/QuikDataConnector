@@ -5,8 +5,76 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QuikDataConnectorSample"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="QuikDataConnector Sample" Height="700" Width="900" MinWidth="700" MinHeight="700">
+    <Window.Resources>
+        <Style x:Key="StateBoxContainerStyle" TargetType="Border">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#FF5B5B5B" />
+        </Style>
+        <Style x:Key="StateBoxStyle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="TextAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="TextBoxOutStyle" TargetType="TextBox">
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
+            <Setter Property="VerticalAlignment" Value="Stretch" />
+        </Style>
+    </Window.Resources>
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="55" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Margin="20,0,10,0" VerticalAlignment="Center">Service Name</TextBlock>
+                <TextBox Width="120" Height="24" Margin="0,0,30,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" MaxLength="48"/>
+                <Button Content="Start" Height="24" Width="80" Margin="0,0,10,0"/>
+                <Button Content="Stop" Height="24" Width="80"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Border Height="24" Width="100" Margin="20,0,10,0" Style="{StaticResource StateBoxContainerStyle}" Background="LightGray">
+                    <TextBlock x:Name="serverStateTextBlock" Text="Stopped" Style="{StaticResource StateBoxStyle}" />
+                </Border>
+                <Border Height="24" Width="100" Margin="0,0,20,0" Style="{StaticResource StateBoxContainerStyle}" Background="LightGray">
+                    <TextBlock x:Name="dataStateTextBlock" Text="---" Style="{StaticResource StateBoxStyle}"/>
+                </Border>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Margin="10,0,0,5">Received Data Types:</TextBlock>
+            <TextBox x:Name="dataTypesOutBox" Grid.Row="1" Margin="10,0,10,0" Style="{StaticResource TextBoxOutStyle}" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Margin="10,10,0,5">Received Data Values:</TextBlock>
+            <TextBox x:Name="dataValuesOutBox" Grid.Row="1" Margin="10,0,10,0" Style="{StaticResource TextBoxOutStyle}" />
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Margin="10,10,0,5">Common Log:</TextBlock>
+            <TextBox x:Name="commonLogOutBox" Grid.Row="1" Margin="10,0,10,10" Style="{StaticResource TextBoxOutStyle}" />
+        </Grid>
     </Grid>
 </Window>
