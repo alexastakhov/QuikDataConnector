@@ -1,11 +1,13 @@
-﻿using System.Windows;
+﻿using System;
+using System.ComponentModel;
+using System.Windows;
 
 namespace QuikDataConnectorSample
 {
     /// <summary>
     /// Логика взаимодействия для MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         /// <summary>
         /// DDE сервер.
@@ -27,6 +29,8 @@ namespace QuikDataConnectorSample
             this.DataContext = this;
         }
 
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
         /// <summary>
         /// Имя сервиса DDE.
         /// </summary>
@@ -42,6 +46,7 @@ namespace QuikDataConnectorSample
             set
             {
                 this.isStarted = value;
+                this.OnPropertyChanged("IsStarted");
             }
         }
 
@@ -59,14 +64,50 @@ namespace QuikDataConnectorSample
                 return;
             }
 
-            if (this.ddeServer == null)
+            if (!this.IsStarted)
             {
-                this.ddeServer = new QDde.Server(this.ServiceName);
+                if (this.ddeServer == null)
+                {
+                    this.ddeServer = new QDde.Server(this.ServiceName);
+                }
+
+                this.ddeServer.Register();
+                this.IsStarted = true;
+
+                this.PrintLog($"DDE Server Server Started. Service Name : \"{this.ServiceName}\"");
             }
+            else
+            {
+                this.ddeServer.Disconnect();
+                this.ddeServer.Dispose();
+                this.ddeServer = null;
+                this.IsStarted = false;
 
-            this.isStarted = true;
+                this.PrintLog("DDE Server Server Stopped. Service Name : \"{this.ServiceName}\"");
+            }
+        }
 
-            this.ddeServer.Register();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="propertyName"></param>
+        protected void OnPropertyChanged(string propertyName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        private void PrintLog(string message)
+        {
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+            this.commonLogOutBox.AppendText(timestamp + " | " + message + "\n");
         }
 
         /// <summary>
@@ -74,16 +115,13 @@ namespace QuikDataConnectorSample
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void StopButton_Click(object sender, RoutedEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (!this.isStarted)
+            if (this.ddeServer != null)
             {
-                MessageBox.Show("Service alredy stopped", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                return;
+                this.ddeServer.Disconnect();
+                this.ddeServer.Dispose();
             }
-
-            this.isStarted = false;
         }
     }
 }

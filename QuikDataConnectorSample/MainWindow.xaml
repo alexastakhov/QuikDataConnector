@@ -5,20 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QuikDataConnectorSample"
         mc:Ignorable="d"
-        Title="Quik Data Connector Sample" Height="700" Width="900" MinWidth="700" MinHeight="700">
+        Title="Quik Data Connector Sample" Height="700" Width="900" MinWidth="700" MinHeight="700" Closing="Window_Closing">
     <Window.Resources>
-        <Style x:Key="StateBoxContainerStyle" TargetType="Border">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="#FF5B5B5B" />
-        </Style>
-        <Style x:Key="StateBoxStyle" TargetType="TextBlock">
-            <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="TextAlignment" Value="Center" />
-        </Style>
         <Style x:Key="TextBoxOutStyle" TargetType="TextBox">
             <Setter Property="IsReadOnly" Value="True" />
             <Setter Property="VerticalScrollBarVisibility" Value="Visible" />
@@ -39,16 +27,97 @@
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Margin="20,0,10,0" VerticalAlignment="Center">Service Name</TextBlock>
-                <TextBox Text="{Binding Path=ServiceName}" IsEnabled="{Binding Path=IsServiceNameEnabled}" Width="120" Height="24" Margin="0,0,30,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" MaxLength="48"/>
-                <Button Content="Start" IsEnabled="{Binding Path=!IsStarted}" Height="24" Width="80" Margin="0,0,10,0" Click="StartButton_Click"/>
-                <Button Content="Stop" IsEnabled="{Binding Path=IsStarted}" Height="24" Width="80" Click="StopButton_Click"/>
+                <TextBox Text="{Binding Path=ServiceName}" Width="120" Height="24" Margin="0,0,30,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" MaxLength="48">
+                    <TextBox.Style>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="False">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+                <Button x:Name="startStopButton" IsEnabled="{Binding Path=!IsStarted}" Height="24" Width="80" Margin="0,0,10,0" Click="StartButton_Click">
+                    <Button.Style>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Content" Value="Start" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="True">
+                                    <Setter Property="Content" Value="Stop" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Border Height="24" Width="100" Margin="20,0,10,0" Style="{StaticResource StateBoxContainerStyle}" Background="LightGray">
-                    <TextBlock x:Name="serverStateTextBlock" Text="Stopped" Style="{StaticResource StateBoxStyle}" />
+                <Border Height="24" Width="100" Margin="20,0,10,0">
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="TextAlignment" Value="Center" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=IsStarted}" Value="False">
+                                        <Setter Property="Text" Value="Stopped" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=IsStarted}" Value="True">
+                                        <Setter Property="Text" Value="Started" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            <Setter Property="VerticalAlignment" Value="Stretch" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="#FF5B5B5B" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="True">
+                                    <Setter Property="Background" Value="Yellow" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="False">
+                                    <Setter Property="Background" Value="LightGray" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                 </Border>
-                <Border Height="24" Width="100" Margin="0,0,20,0" Style="{StaticResource StateBoxContainerStyle}" Background="LightGray">
-                    <TextBlock x:Name="dataStateTextBlock" Text="---" Style="{StaticResource StateBoxStyle}"/>
+                <Border Height="24" Width="100" Margin="0,0,20,0" Background="LightGray">
+                    <TextBlock x:Name="dataStateTextBlock" Text="---">
+                        <TextBlock.Style>
+                            <Style TargetType="{x:Type TextBlock}">
+                                <Setter Property="FontWeight" Value="SemiBold" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="TextAlignment" Value="Center" />
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Border.Style>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="HorizontalAlignment" Value="Stretch" />
+                            <Setter Property="VerticalAlignment" Value="Stretch" />
+                            <Setter Property="BorderThickness" Value="1" />
+                            <Setter Property="BorderBrush" Value="#FF5B5B5B" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="True">
+                                    <Setter Property="Background" Value="Yellow" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="False">
+                                    <Setter Property="Background" Value="LightGray" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
                 </Border>
             </StackPanel>
         </Grid>
@@ -58,7 +127,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Margin="10,0,0,5">Received Data Types:</TextBlock>
-            <TextBox x:Name="dataTypesOutBox" Grid.Row="1" Margin="10,0,10,0" Style="{StaticResource TextBoxOutStyle}" />
+            <TextBox x:Name="dataTypesOutBox" Grid.Row="1" Margin="10,0,10,0" Style="{StaticResource TextBoxOutStyle}" FontFamily="Consolas" FontSize="11" />
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
@@ -66,7 +135,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Margin="10,10,0,5">Received Data Values:</TextBlock>
-            <TextBox x:Name="dataValuesOutBox" Grid.Row="1" Margin="10,0,10,0" Style="{StaticResource TextBoxOutStyle}" />
+            <TextBox x:Name="dataValuesOutBox" Grid.Row="1" Margin="10,0,10,0" Style="{StaticResource TextBoxOutStyle}" FontFamily="Consolas" FontSize="11" />
         </Grid>
         <Grid Grid.Row="3">
             <Grid.RowDefinitions>
@@ -74,7 +143,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <TextBlock Margin="10,10,0,5">Common Log:</TextBlock>
-            <TextBox x:Name="commonLogOutBox" Grid.Row="1" Margin="10,0,10,10" Style="{StaticResource TextBoxOutStyle}" />
+            <TextBox x:Name="commonLogOutBox" Grid.Row="1" Margin="10,0,10,10" Style="{StaticResource TextBoxOutStyle}" FontFamily="Consolas" FontSize="11" />
         </Grid>
     </Grid>
 </Window>
