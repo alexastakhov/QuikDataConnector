@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="Server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerState.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NDde\NDde.csproj">

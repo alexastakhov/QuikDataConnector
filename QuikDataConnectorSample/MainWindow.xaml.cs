@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QDde;
+using System;
 using System.ComponentModel;
 using System.Windows;
 
@@ -72,18 +73,20 @@ namespace QuikDataConnectorSample
                 }
 
                 this.ddeServer.Register();
+                this.ddeServer.SetServerStateChangedCallback(OnServerStateChanged);
                 this.IsStarted = true;
 
-                this.PrintLog($"DDE Server Server Started. Service Name : \"{this.ServiceName}\"");
+                this.PrintLog($"DDE Server Server Started. Service Name : \"{this.ddeServer.ServiceName}\"");
             }
             else
             {
                 this.ddeServer.Disconnect();
+
+                this.PrintLog($"DDE Server Server Stopped. Service Name : \"{this.ddeServer.ServiceName}\"");
+
                 this.ddeServer.Dispose();
                 this.ddeServer = null;
                 this.IsStarted = false;
-
-                this.PrintLog("DDE Server Server Stopped. Service Name : \"{this.ServiceName}\"");
             }
         }
 
@@ -122,6 +125,16 @@ namespace QuikDataConnectorSample
                 this.ddeServer.Disconnect();
                 this.ddeServer.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Обратный вызов изменения состояния сервера.
+        /// </summary>
+        /// <param name="oldState">Текущее состояние.</param>
+        /// <param name="newState">Новое состояние.</param>
+        private void OnServerStateChanged(ServerState oldState, ServerState newState)
+        {
+            this.PrintLog($"Server state changed \"{oldState}\" --> \"{newState}\"");
         }
     }
 }

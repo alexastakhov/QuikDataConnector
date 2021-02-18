@@ -1,16 +1,43 @@
 ﻿using NDde.Server;
+using System;
 
 namespace QDde
 {
+    public delegate void ServerStateChangedCallback(ServerState oldState, ServerState newState);
+
+    /// <summary>
+    /// Класс DDE сервера.
+    /// </summary>
     public class Server : DdeServer
     {
+        /// <summary>
+        /// Обратный вызов изменения состояния сервера.
+        /// </summary>
+        private ServerStateChangedCallback serverStateChangedCallback = null;
+
+        /// <summary>
+        /// Основной конструктор.
+        /// </summary>
+        /// <param name="serviceName">Имя сервиса.</param>
         public Server(string serviceName) : base(serviceName)
         {
+            this.State = ServerState.Unspecified;
         }
 
-        public override string Service => base.Service;
+        /// <summary>
+        /// Имя сервиса.
+        /// </summary>
+        public string ServiceName => base.Service;
 
+        /// <summary>
+        /// Флаг регистрации сервиса.
+        /// </summary>
         public override bool IsRegistered => base.IsRegistered;
+
+        /// <summary>
+        /// Состояние сервера.
+        /// </summary>
+        public ServerState State { get; private set; }
 
         public override void Advise(string topic, string item)
         {
@@ -72,6 +99,20 @@ namespace QDde
             base.Unregister();
         }
 
+        /// <summary>
+        /// Установить обратный вызов изменения состояния сервера.
+        /// </summary>
+        /// <param name="callback">Обратный вызов</param>
+        public void SetServerStateChangedCallback(ServerStateChangedCallback callback)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentException("ServerStateChangedCallback cannot be NULL");
+            }
+
+            this.serverStateChangedCallback = callback;
+        }
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -85,6 +126,8 @@ namespace QDde
         protected override void OnAfterConnect(DdeConversation conversation)
         {
             base.OnAfterConnect(conversation);
+
+            this.SetState(ServerState.Connected);
         }
 
         protected override bool OnBeforeConnect(string topic)
@@ -95,6 +138,8 @@ namespace QDde
         protected override void OnDisconnect(DdeConversation conversation)
         {
             base.OnDisconnect(conversation);
+
+            this.SetState(ServerState.Disconnected);
         }
 
         protected override ExecuteResult OnExecute(DdeConversation conversation, string command)
@@ -120,6 +165,20 @@ namespace QDde
         protected override void OnStopAdvise(DdeConversation conversation, string item)
         {
             base.OnStopAdvise(conversation, item);
+        }
+
+        /// <summary>
+        /// Установить состояние сервера.
+        /// </summary>
+        /// <param name="state">Новое состояние сервера.</param>
+        private void SetState(ServerState newState)
+        {
+            if (this.serverStateChangedCallback != null)
+            {
+                this.serverStateChangedCallback.Invoke(this.State, newState);
+            }
+
+            this.State = newState;
         }
     }
 }
