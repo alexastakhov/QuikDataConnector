@@ -3,7 +3,24 @@ using System;
 
 namespace QDde
 {
+    /// <summary>
+    /// Делегат обратного вызова изменения состояния сервера.
+    /// </summary>
+    /// <param name="oldState"></param>
+    /// <param name="newState"></param>
     public delegate void ServerStateChangedCallback(ServerState oldState, ServerState newState);
+
+    /// <summary>
+    /// Делегат обратного вызова получения данных.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <param name="isPaused"></param>
+    /// <param name="serviceName"></param>
+    /// <param name="topic"></param>
+    /// <param name="tag"></param>
+    /// <param name="item"></param>
+    /// <param name="data"></param>
+    public delegate void PokeCallback(IntPtr handle, bool isPaused, string serviceName, string topic, object tag, string item, byte[] data);
 
     /// <summary>
     /// Класс DDE сервера.
@@ -14,6 +31,11 @@ namespace QDde
         /// Обратный вызов изменения состояния сервера.
         /// </summary>
         private ServerStateChangedCallback serverStateChangedCallback = null;
+
+        /// <summary>
+        /// Обратный вызов получения данных.
+        /// </summary>
+        private PokeCallback pokeCallback = null;
 
         /// <summary>
         /// Основной конструктор.
@@ -102,7 +124,7 @@ namespace QDde
         /// <summary>
         /// Установить обратный вызов изменения состояния сервера.
         /// </summary>
-        /// <param name="callback">Обратный вызов</param>
+        /// <param name="callback">Обратный вызов.</param>
         public void SetServerStateChangedCallback(ServerStateChangedCallback callback)
         {
             if (callback == null)
@@ -111,6 +133,20 @@ namespace QDde
             }
 
             this.serverStateChangedCallback = callback;
+        }
+
+        /// <summary>
+        /// Установить обратный вызов получения данных.
+        /// </summary>
+        /// <param name="callback">Обратный вызов.</param>
+        public void SetPokeCallback(PokeCallback callback)
+        {
+            if (callback == null)
+            {
+                throw new ArgumentException("PokeCallback cannot be NULL");
+            }
+
+            this.pokeCallback = callback;
         }
 
         protected override void Dispose(bool disposing)
@@ -147,8 +183,28 @@ namespace QDde
             return base.OnExecute(conversation, command);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="conversation"></param>
+        /// <param name="item"></param>
+        /// <param name="data"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
         protected override PokeResult OnPoke(DdeConversation conversation, string item, byte[] data, int format)
         {
+            if (this.pokeCallback != null)
+            {
+                this.pokeCallback.Invoke(
+                    conversation.Handle,
+                    conversation.IsPaused,
+                    conversation.Service,
+                    conversation.Topic,
+                    conversation.Tag,
+                    item,
+                    data);
+            }
+            
             return base.OnPoke(conversation, item, data, format);
         }
 

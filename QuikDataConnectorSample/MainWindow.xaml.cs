@@ -74,6 +74,7 @@ namespace QuikDataConnectorSample
 
                 this.ddeServer.Register();
                 this.ddeServer.SetServerStateChangedCallback(OnServerStateChanged);
+                this.ddeServer.SetPokeCallback(OnPoke);
                 this.IsStarted = true;
 
                 this.PrintLog($"DDE Server Server Started. Service Name : \"{this.ddeServer.ServiceName}\"");
@@ -103,14 +104,34 @@ namespace QuikDataConnectorSample
         }
 
         /// <summary>
-        /// 
+        /// Вывести сообщение в лог.
         /// </summary>
-        /// <param name="message"></param>
-        private void PrintLog(string message)
+        /// <param name="message">Текст сообщения.</param>
+        /// <param name="logType">Тип логгирования.</param>
+        private void PrintLog(string message, LogType logType = LogType.Common)
         {
-            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action<string, LogType>(PrintLog), new object[] { message, logType });
 
-            this.commonLogOutBox.AppendText(timestamp + " | " + message + "\n");
+                return;
+            }
+
+            var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var messageToLog = timestamp + " | " + message + "\n";
+
+            if (logType == LogType.Common)
+            {
+                this.commonLogOutBox.AppendText(messageToLog);
+            }
+            else if (logType == LogType.DataTypes)
+            {
+                this.dataTypesOutBox.AppendText(messageToLog);
+            }
+            else if (logType == LogType.DataValues)
+            {
+                this.dataValuesOutBox.AppendText(messageToLog);
+            }
         }
 
         /// <summary>
@@ -135,6 +156,31 @@ namespace QuikDataConnectorSample
         private void OnServerStateChanged(ServerState oldState, ServerState newState)
         {
             this.PrintLog($"Server state changed \"{oldState}\" --> \"{newState}\"");
+        }
+
+        /// <summary>
+        /// Обратный вызов получения данных.
+        /// </summary>
+        /// <param name="handle"></param>
+        /// <param name="isPaused"></param>
+        /// <param name="serviceName"></param>
+        /// <param name="topic"></param>
+        /// <param name="tag"></param>
+        /// <param name="item"></param>
+        /// <param name="data"></param>
+        private void OnPoke(IntPtr handle, bool isPaused, string serviceName, string topic, object tag, string item, byte[] data)
+        {
+            this.PrintLog($"OnPoke", LogType.DataValues);
+        }
+
+        /// <summary>
+        /// Типы логов, для выбора окна логгирования.
+        /// </summary>
+        private enum LogType
+        {
+            Common,
+            DataTypes,
+            DataValues
         }
     }
 }
