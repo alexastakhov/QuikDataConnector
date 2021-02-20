@@ -180,7 +180,7 @@ namespace QDde
 
         protected override ExecuteResult OnExecute(DdeConversation conversation, string command)
         {
-            return base.OnExecute(conversation, command);
+            return ExecuteResult.Processed;
         }
 
         /// <summary>
@@ -204,8 +204,8 @@ namespace QDde
                     item,
                     data);
             }
-            
-            return base.OnPoke(conversation, item, data, format);
+
+            return PokeResult.Processed;
         }
 
         protected override RequestResult OnRequest(DdeConversation conversation, string item, int format)

@@ -123,14 +123,17 @@ namespace QuikDataConnectorSample
             if (logType == LogType.Common)
             {
                 this.commonLogOutBox.AppendText(messageToLog);
+                this.commonLogOutBox.ScrollToEnd();
             }
             else if (logType == LogType.DataTypes)
             {
                 this.dataTypesOutBox.AppendText(messageToLog);
+                this.dataTypesOutBox.ScrollToEnd();
             }
             else if (logType == LogType.DataValues)
             {
                 this.dataValuesOutBox.AppendText(messageToLog);
+                this.dataValuesOutBox.ScrollToEnd();
             }
         }
 
@@ -170,7 +173,7 @@ namespace QuikDataConnectorSample
         /// <param name="data"></param>
         private void OnPoke(IntPtr handle, bool isPaused, string serviceName, string topic, object tag, string item, byte[] data)
         {
-            this.PrintLog($"OnPoke", LogType.DataValues);
+            this.PrintLog($"OnPoke : Topic={topic} Item={item} dataLen={data.Length}", LogType.DataValues);
         }
 
         /// <summary>
