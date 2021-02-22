@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QuikDataConnectorSample"
         mc:Ignorable="d"
-        Title="Quik Data Connector Sample" Height="700" Width="900" MinWidth="700" MinHeight="700" Closing="Window_Closing">
+        Title="Quik Data Connector Sample" Height="700" Width="900" MinWidth="900" MinHeight="700" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="TextBoxOutStyle" TargetType="TextBox">
             <Setter Property="IsReadOnly" Value="True" />
@@ -27,7 +27,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Margin="20,0,10,0" VerticalAlignment="Center">Service Name</TextBlock>
-                <TextBox Text="{Binding Path=ServiceName}" Width="120" Height="24" Margin="0,0,30,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" MaxLength="48">
+                <TextBox Text="{Binding Path=ServiceName}" Width="120" Height="24" Margin="0,0,10,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" MaxLength="48">
                     <TextBox.Style>
                         <Style TargetType="{x:Type TextBox}">
                             <Style.Triggers>
@@ -41,7 +41,7 @@
                         </Style>
                     </TextBox.Style>
                 </TextBox>
-                <Button x:Name="startStopButton" IsEnabled="{Binding Path=!IsStarted}" Height="24" Width="80" Margin="0,0,10,0" Click="StartButton_Click">
+                <Button x:Name="startStopButton" IsEnabled="{Binding Path=!IsStarted}" Height="24" Width="80" Margin="0,0,50,0" Click="StartButton_Click">
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Content" Value="Start" />
@@ -53,6 +53,20 @@
                         </Style>
                     </Button.Style>
                 </Button>
+                <CheckBox IsChecked="{Binding Path=IsSaveToFile}" Content="Save Data to File" VerticalAlignment="Center">
+                    <CheckBox.Style>
+                        <Style TargetType="{x:Type CheckBox}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=IsStarted, Mode=OneWay}" Value="False">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </CheckBox.Style>
+                </CheckBox>
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                 <Border Height="24" Width="100" Margin="20,0,10,0">
